@@ -63,6 +63,21 @@
 ;; Add xclip support so we can copy/paste from emacs
 (xclip-mode 1) 
 
+;; Don't fit lines in screen
+(setq-default truncate-lines t)
+
+;; Don't make ag steal focus
+(with-eval-after-load 'ag
+  (defun my/ag-keep-focus (orig-fn &rest args)
+    "Run ag's result navigation, then return focus to the ag window."
+    (let ((ag-window (selected-window)))
+      (apply orig-fn args)
+      (when (window-live-p ag-window)
+        (select-window ag-window))))
+
+  (advice-add 'ag/next-error-function :around #'my/ag-keep-focus))
+(setq ag-reuse-window nil)
+
 ;; Dunno probably gets rid of redundant save files
 ;; Stole it from SO
 (setq make-backup-files t  
